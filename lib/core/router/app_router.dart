@@ -17,6 +17,7 @@ import '../../features/messages/presentation/pages/messages_page.dart';
 import '../../features/messages/presentation/pages/chat_detail_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../core/widgets/main_shell.dart';
+import 'route_names.dart';
 
 final _authListenable = ValueNotifier<bool>(false);
 
