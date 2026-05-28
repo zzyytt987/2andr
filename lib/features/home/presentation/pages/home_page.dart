@@ -160,21 +160,25 @@ class _HomePageState extends ConsumerState<HomePage> {
     return jobsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline,
-                color: AppColors.mutedForeground, size: 48),
-            const SizedBox(height: 12),
-            const Text(AppStrings.networkError,
-                style: TextStyle(color: AppColors.mutedForeground)),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () =>
-                  ref.read(homeJobsProvider(tab).notifier).loadJobs(),
-              child: const Text(AppStrings.retry),
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline,
+                  color: AppColors.mutedForeground, size: 48),
+              const SizedBox(height: 12),
+              Text(e.toString(),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: AppColors.mutedForeground, fontSize: 13)),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () =>
+                    ref.read(homeJobsProvider(tab).notifier).loadJobs(),
+                child: const Text(AppStrings.retry),
+              ),
+            ],
+          ),
         ),
       ),
       data: (jobs) {
