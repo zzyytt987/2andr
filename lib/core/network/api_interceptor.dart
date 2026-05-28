@@ -1,7 +1,12 @@
+import 'dart:async';
 import 'package:dio/dio.dart';
 import '../storage/local_storage.dart';
 
 class AuthInterceptor extends QueuedInterceptor {
+  /// Called when both access and refresh tokens are invalid.
+  static final _onAuthLostController = StreamController<void>.broadcast();
+  static Stream<void> get onAuthLost => _onAuthLostController.stream;
+
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
     final token = await LocalStorage.getAccessToken();
@@ -14,6 +19,7 @@ class AuthInterceptor extends QueuedInterceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401) {
+      bool refreshed = false;
       final refreshToken = await LocalStorage.getRefreshToken();
       if (refreshToken != null) {
         try {
@@ -35,9 +41,11 @@ class AuthInterceptor extends QueuedInterceptor {
             final retryResponse = await dio.fetch(err.requestOptions);
             return handler.resolve(retryResponse);
           }
-        } catch (_) {
-          await LocalStorage.clearTokens();
-        }
+        } catch (_) {}
+      }
+      if (!refreshed) {
+        await LocalStorage.clearTokens();
+        _onAuthLostController.add(null);
       }
     }
     handler.next(err);

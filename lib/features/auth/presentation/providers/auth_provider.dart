@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/network/api_interceptor.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../data/datasources/auth_remote_datasource.dart';
@@ -55,7 +56,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   AuthNotifier(this._authRepository) : super(const AuthState()) {
     checkAuthStatus();
+    _authLostSub = AuthInterceptor.onAuthLost.listen((_) {
+      state = const AuthState(status: AuthStatus.unauthenticated);
+    });
   }
+
+  StreamSubscription<void>? _authLostSub;
 
   Stream<AuthState> get stream => _streamController.stream;
   final _streamController = StreamController<AuthState>.broadcast();
@@ -152,6 +158,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   @override
   void dispose() {
+    _authLostSub?.cancel();
     _streamController.close();
     super.dispose();
   }
