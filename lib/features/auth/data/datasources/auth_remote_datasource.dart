@@ -26,10 +26,9 @@ class AuthRemoteDataSource {
   }
 
   Future<Map<String, dynamic>> register(
-      String phone, String code, String password) async {
+      String phone, String password) async {
     final response = await _dio.post(ApiConstants.register, data: {
       'phone': phone,
-      'smsCode': code,
       'password': password,
     });
     return response.data['data'];

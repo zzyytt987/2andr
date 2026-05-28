@@ -14,7 +14,6 @@ class RegisterPage extends ConsumerStatefulWidget {
 
 class _RegisterPageState extends ConsumerState<RegisterPage> {
   final _phoneController = TextEditingController();
-  final _codeController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _showPassword = false;
   bool _agreed = false;
@@ -22,7 +21,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   @override
   void dispose() {
     _phoneController.dispose();
-    _codeController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -31,24 +29,12 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       RegExp(r'^1[3-9]\d{9}$').hasMatch(_phoneController.text);
   bool get _isPasswordValid => _passwordController.text.length >= 6;
   bool get _canRegister =>
-      _agreed &&
-      _isPhoneValid &&
-      _codeController.text.isNotEmpty &&
-      _isPasswordValid;
-
-  Future<void> _sendSms() async {
-    if (_phoneController.text.length == 11) {
-      await ref
-          .read(authProvider.notifier)
-          .sendSmsCode(_phoneController.text, 'REGISTER');
-    }
-  }
+      _agreed && _isPhoneValid && _isPasswordValid;
 
   Future<void> _handleRegister() async {
     if (!_canRegister) return;
     await ref.read(authProvider.notifier).register(
           _phoneController.text,
-          _codeController.text,
           _passwordController.text,
         );
   }
@@ -106,40 +92,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                     style: TextStyle(
                         color: AppColors.destructive, fontSize: 12)),
               ),
-            const SizedBox(height: 20),
-
-            // SMS code
-            Text('验证码',
-                style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.foreground)),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _codeController,
-                    keyboardType: TextInputType.number,
-                    maxLength: 6,
-                    decoration: const InputDecoration(
-                      hintText: '请输入验证码',
-                      counterText: '',
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                SizedBox(
-                  height: 56,
-                  child: ElevatedButton(
-                    onPressed: _isPhoneValid ? _sendSms : null,
-                    style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(120, 56)),
-                    child: const Text('获取验证码'),
-                  ),
-                ),
-              ],
-            ),
             const SizedBox(height: 20),
 
             // Password

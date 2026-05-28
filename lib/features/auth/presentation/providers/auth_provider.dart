@@ -121,10 +121,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  Future<void> register(String phone, String code, String password) async {
+  Future<void> register(String phone, String password) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
-      final user = await _authRepository.register(phone, code, password);
+      final user = await _authRepository.register(phone, password);
       state = state.copyWith(
         status: AuthStatus.authenticated,
         user: user,
